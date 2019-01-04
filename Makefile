@@ -1,16 +1,13 @@
 all: test-lab
 
-test-lab: elementliste.o liste.o squelette.o mainfile.c
-	gcc -Wall -o test-lab elementliste.o liste.o squelette.o mainfile.c
+test-lab: csvReading.o command.o launcher.c
+	gcc -Wall -o test-lab csvReading.o command.o launcher.c
 
-squelette.o: squelette.c
-	gcc -c -Wall -o squelette.o squelette.c
+csvReading.o: csvReading.c
+	gcc -c -Wall -o csvReading.o csvReading.c
 
-elementliste.o: elementliste.c
-	gcc-c -Wall -o elementliste.o elementliste.c
-
-liste.o: liste.c
-	gcc -c -Wall -o liste.o liste.c
+command.o: command.c
+	gcc -c -Wall -o command.o command.c
 
 clean :
-	rm liste.o elementliste.o squelette.o test-lab
+	rm csvReading.o command.o test-lab

@@ -1,18 +1,33 @@
 #include "command.h"
 
-void init_t_command(*t_command arrCmd) {
-    arrCmd->argOccur = (int *) malloc(10*sizeof(int));
-    memset(arrCmd->argOccur, 0, 10 * sizeof(int));
-    arrCmd->filesLink = (FILE*) malloc(2*sizeof(FILE));
+void afficher_t_command(t_command* arrCmd) {
+    static char argPossible[ARGMAX][5] = {"-m", "-i", "-l", "-d", "cm", "cp", "cs", "va", "uni1", "uni2"};
+    printf("\n /./././././ AFFICHAGE STRUCT COMMAND /./././././ \n");
+    printf("arguments: [");
+    for(int k=0; k<ARGMAX; ++k)
+        printf("%s, ", argPossible[k]);
+    printf("]\nargOccur:  [");
+    for(int k=0; k<ARGMAX; ++k)
+        printf("%d , ", arrCmd->argOccur[k]);
+    printf("]\nfileNames: [%s, %s]\n\n", arrCmd->fileNames[0], arrCmd->fileNames[1]);
+    //afficher_csv_array(&arrCmd->csvFile);
 }
 
-int checkArgValid(*t_command arrCmd, int argc, char *argv[]) {
+void init_t_command(t_command* arrCmd) {
+    arrCmd->argOccur = (int *) malloc(ARGMAX*sizeof(int));
+    memset(arrCmd->argOccur, 0, ARGMAX * sizeof(int));
+    arrCmd->fileNames = (char**) malloc(LINKMAX*sizeof(char*));
+    arrCmd->fileNames[0] = "no .csv file";
+    arrCmd->fileNames[1] = "no .txt file";
+}
+
+int checkArgValid(t_command* arrCmd, int argc, char *argv[]) {
     printf("\ncheckArgValid ENTRY \n");
-    if(arrCmd->argTab[0] > 0) {    // SI -m ALORS ON DOIT AVOIR AU MOINS UN PARMIS: cm, cp, cs, va, uni1, uni2.
+    if(arrCmd->argOccur[0] > 0) {    // SI -m ALORS ON DOIT AVOIR AU MOINS UN PARMIS: cm, cp, cs, va, uni1, uni2.
         int condArg_M = 0;
         int a = 9;
         while(a >= 4 && condArg_M < 1) {
-            if(arrCmd->argTab[a] > 0)
+            if(arrCmd->argOccur[a] > 0)
                 condArg_M++;
             a--;
         }
@@ -21,34 +36,35 @@ int checkArgValid(*t_command arrCmd, int argc, char *argv[]) {
             return 0;
         }
     }
-    if(arrCmd->argTab[3] > 0) {  // SI -d alors
-        if(arrCmd->argTab[1] > 0) {  // SI -i alors CONFLIT CAR -d ET -i SIMULTANES
+    if(arrCmd->argOccur[3] > 0) {  // SI -d alors
+        printf("-d présent\n");
+        if(arrCmd->argOccur[1] > 0) {  // SI -i alors CONFLIT CAR -d ET -i SIMULTANES
             printf("ERROR: -i et -d en simultanés ! \n");
             return 0;
         }
-        arrCmd->argTab[9] = 0;
-        arrCmd->argTab[8] = 0;
-        arrCmd->argTab[7] = 0;
+        arrCmd->argOccur[9] = 0;
+        arrCmd->argOccur[8] = 0;
+        arrCmd->argOccur[7] = 0;
     }
-    else if(arrCmd->argTab[1] == 0) { // SI -i alors (sachant que pas de -d car testé au dessus)
+    else if(arrCmd->argOccur[1] == 0) { // SI -i alors (sachant que pas de -d car testé au dessus)
         printf("ERROR: absence de -i ou -d ! \n");
         return 0;
     }
-    printf("RETURN checkInvalidError: 1 \n");
+    printf("RETURN checkInvalidError: Good \n");
     return 1;
 }
 
 int get_arg_index(char *arg) {
-    static char argPossible[10][5] = {"-m", "-i", "-l", "-d", "cm", "cp", "cs", "va", "uni1", "uni2"};
-    for(int indice=0; indice<10; indice++) {
+    static char argPossible[ARGMAX][5] = {"-m", "-i", "-l", "-d", "cm", "cp", "cs", "va", "uni1", "uni2"};
+    for(int indice=0; indice<ARGMAX; indice++) {
         if(strcmp(arg,argPossible[indice])==0)
             return indice;
     }
     return -1;
 }
 
-int verifFollowing(char *argv[], int index, int indiceArg, *t_command arrCmd) {
-    int filetype;
+int verifFile(char *argv[], int index, int indiceArg, t_command* arrCmd) {
+    int filetype = -1; // 0 = CSV       // 1 = TXT
     printf("\n ENTRY verifFollowing with argument: %s , indice: %d\n", argv[index], indiceArg);
     char* nextArg = argv[index+1];
     printf("nextArg: %s \n", nextArg);
@@ -61,27 +77,41 @@ int verifFollowing(char *argv[], int index, int indiceArg, *t_command arrCmd) {
     else {     //SINON pour -d / -i / -l , on attend un FICHIER
         char* extension = strrchr(nextArg, '.');
         printf("extension: %s\n", extension);
-        if(indiceArg == 2) {  // SI -l
-            if(strcmp(".txt", extension) != 0)
+        if(extension == NULL) { // SI n'est pas un fichier
+            printf("ERREUR FICHIER ARGUMENT DU FICHIER INCORRECT \n");
+            return 0;
+        }
+        else if(indiceArg == 2) {  // SI -l
+            if(strcmp(".txt", extension) != 0) {
+                printf("ERREUR FICHIER TXT ATTENDU AU LIEU DE : %s \n", extension);
                 return 0;
+            }
             filetype = 1;
         }
         else if(indiceArg==1 || indiceArg==3) {  // SI -d / -i
-        printf("strcomp: %d\n", strcmp(".csv", extension));
-            if(strcmp(".csv", extension) != 0)
+            printf("strcomp: %d\n", strcmp(".csv", extension));
+            if(strcmp(".csv", extension) != 0) {
+                printf("ERREUR FICHIER CSV ATTENDU AU LIEU DE : %s \n", extension);
                 return 0;
+            }
             filetype = 0;
         }
         FILE *pFile;
         pFile = fopen(nextArg, "r");
         printf("file opened \n");
-        if(pFile != NULL) {
-            arrCmd->filesLink[filetype] = nextArg;
-            fclose(pFile);
-            return 1;
+        if(pFile == NULL) {
+            printf("INCORRECT FILE\n");
+            return 0;
         }
+        //strcpy(arrCmd->fileNames[filetype], nextArg);
+        arrCmd->fileNames[filetype] = nextArg;
+        printf("CORRECT FILE \n");
         fclose(pFile);
-        return 0;
+        if(filetype == 0) {
+            printf("FILL CSV ! \n\n");
+            fillCsvArray(&arrCmd->csvFile, nextArg);
+        }
+        return 1;
     }
 }
 
@@ -91,26 +121,36 @@ int parameterNeeded(int indice) {
     return 0;
 }
 
-t_command analyseCommande(int argc, char *argv[]) {
-    t_command cmdArray;
-    init_t_command(&cmdArray);
-    static char argPossible[10][5] = {"-m", "-i", "-l", "-d", "cm", "cp", "cs", "va", "uni1", "uni2"};
+int analyseCommande(t_command cmdArray, int argc, char *argv[]) {
+    printf("argc: %d\n", argc);
     int indiceBuff = 0;
-    for(int k=0; k<argc; ++k) {
+    for(int k=1; k<argc; ++k) {
+        //afficher_t_command(&cmdArray);
         printf("get_arg_index(%s) \n", argv[k]);
         indiceBuff = get_arg_index(argv[k]);
-        printf("indice: %s \n", argv[k]);
         if(indiceBuff != -1) {
+            printf("argument valable trouvé (%s)\n", argv[k]);
             cmdArray.argOccur[indiceBuff]=1;
-            printf("k:%d et argc-1:%d et indice:%d\n", k, argc-1, indiceBuff);
-            if(k!=argc-1 && parameterNeeded(indiceBuff) == 1) {  // SI IL EXISTE UN ARGUMENT SUIVANT ET QUE L'ARGUMENT ETUDIÉ NECESSITE UN PARAMETRE
-                if(verifFollowing(argv, k, indiceBuff) == 0)  // SI LE PARAMETRE ET INCORRECT  
+            if(parameterNeeded(indiceBuff) == 1) {
+                if(k!=argc-1) {  // SI IL EXISTE UN ARGUMENT SUIVANT ET QUE L'ARGUMENT ETUDIÉ NECESSITE UN PARAMETRE
+                    printf("entree if 1E \n");
+                    if(verifFile(argv, k, indiceBuff, &cmdArray) == 0) { // SI LE PARAMETRE ET INCORRECT  
+                        printf("Mauvais argument suivant le %s ! \n", argv[k]);
+                        return 0;
+                    }
+                }
+                else {
+                    printf("Un argument est nécessaire après %s !\n", argv[k]);
                     return 0;
-            }
+                }
+            }   
         }
         
     }
-    for(int _=0; _< 10; ++_)
-        printf("argOccur '%s': %d \n", argPossible[_], cmdArray.argOccur[_]);
-    return checkArgValid(cmdArray.argOccur, argc, argv);
+    if(checkArgValid(&cmdArray, argc, argv))
+        return 1;
+    else {
+        printf("ERROR\n");
+        return 0;
+    }
 }

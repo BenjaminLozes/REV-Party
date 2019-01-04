@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 #include "liste.h"
-
+ 
 int main() {
   liste p;
 	Elementliste e1,e2,e;

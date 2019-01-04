@@ -3,6 +3,9 @@
 /// \date august 2018
 #ifndef GLOBAL_H
 #define GLOBAL_H
+
+#define KO -1
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

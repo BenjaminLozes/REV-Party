@@ -1,13 +1,21 @@
 all: test-lab
 
-test-lab: csvReading.o command.o launcher.c
-	gcc -Wall -o test-lab csvReading.o command.o launcher.c
+csv : csvTest
 
-csvReading.o: csvReading.c
-	gcc -c -Wall -o csvReading.o csvReading.c
+csvTest: squelette.o csvanalyse.c
+	gcc -g -Wall -o csvTest squelette.o csvanalyse.c
+
+test-lab: squelette.o csvanalyse.o command.o launcher.c
+	gcc -g -Wall -o test-lab squelette.o csvanalyse.o command.o launcher.c
+
+squelette.o: squelette.c
+	gcc -c -Wall -o squelette.o squelette.c
+
+csvanalyse.o: csvanalyse.c
+	gcc -c -Wall -o csvanalyse.o csvanalyse.c
 
 command.o: command.c
 	gcc -c -Wall -o command.o command.c
 
 clean :
-	rm csvReading.o command.o test-lab
+	rm squelette.o csvanalyse.o command.o test-lab

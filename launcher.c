@@ -3,9 +3,11 @@
 int main(int argc, char *argv[]) {
     t_command cmdArray;
     init_t_command(&cmdArray);
-    int valid = analyseCommande(cmdArray, argc, argv);
-    if(valid==0)
+    FILE* logfp = checkLog(&cmdArray, argc, argv);
+    if(analyseCommande(&cmdArray, argc, argv, logfp)==0) {
+        fprintf(logfp, "ERREUR ENCULER\n");
         return 0;
-    if(valid==1)
-        afficher_t_command(&cmdArray);
+    }
+    afficher_t_command(&cmdArray, logfp);
+    return 1;
 }

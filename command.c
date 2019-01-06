@@ -1,9 +1,9 @@
 #include "command.h"
 
 void init_tab_char_dyn(tab_candidats *t_tabchar) {
-    int dim = getNbRows("candidats.txt")+1;
-    t_tabchar->tab = (char**) malloc(dim*sizeof(char*));
-    for(int i=0; i<dim; i++)
+    t_tabchar->dim = getNbRows("candidats.txt")+1;
+    t_tabchar->tab = (char**) malloc(t_tabchar->dim*sizeof(char*));
+    for(int i=0; i<t_tabchar->dim; i++)
         t_tabchar->tab[i] = "Candidat X";
     FILE * fp = fopen("candidats.txt", "r");
     char line[512];
@@ -45,6 +45,8 @@ void afficher_t_command(t_command* arrCmd, FILE* logfp) {
     fprintf(logfp, "]\nargOccur:  [");
     for(int k=0; k<ARGMAX; ++k)
         fprintf(logfp, "%d , ", arrCmd->argOccur[k]);
+    if(arrCmd->log == 0)
+        arrCmd->fileNames[1] = "TXT file";
     fprintf(logfp, "]\nfileNames: [%s, %s] \nLog requis: %d \nMethode: %s\n\n", arrCmd->fileNames[0], arrCmd->fileNames[1], arrCmd->log, argPossible[arrCmd->methodNb]);
     fprintf(logfp, "-OUT afficher_t_command \n\n");
 }
@@ -55,7 +57,6 @@ void init_t_command(t_command* arrCmd) {
     arrCmd->fileNames = (char**) malloc(LINKMAX*sizeof(char*));
     arrCmd->fileNames[0] = "CSV file";
     arrCmd->fileNames[1] = "TXT file";
-    init_tab_char_dyn(&arrCmd->candidats);
     arrCmd->log = 0;
     arrCmd->methodNb = 0;
 }

@@ -1,5 +1,21 @@
 #include "command.h"
 
+void init_tab_char_dyn(tab_candidats *t_tabchar) {
+    int dim = getNbRows("candidats.txt")+1;
+    t_tabchar->tab = (char**) malloc(dim*sizeof(char*));
+    for(int i=0; i<dim; i++)
+        t_tabchar->tab[i] = "Candidat X";
+    FILE * fp = fopen("candidats.txt", "r");
+    char line[512];
+    char *token;                   
+    int k=0;
+    while (fgets(line, 512, fp)) {
+        token = strtok(line, "\n");
+        strcpy(&t_tabchar->tab[k++],token);
+    }
+    fclose(fp);
+}
+
 bool verifMethod(char* arg) {
     if(get_arg_index(arg) > 3)
         return 1;
@@ -39,6 +55,7 @@ void init_t_command(t_command* arrCmd) {
     arrCmd->fileNames = (char**) malloc(LINKMAX*sizeof(char*));
     arrCmd->fileNames[0] = "CSV file";
     arrCmd->fileNames[1] = "TXT file";
+    init_tab_char_dyn(&arrCmd->candidats);
     arrCmd->log = 0;
     arrCmd->methodNb = 0;
 }

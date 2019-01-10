@@ -1,24 +1,49 @@
 #include "utils_sd.h"
 
-void init_tab_char_dyn(tab_candidats *candidats, FILE* logfp) {
-    candidats->dim = getNbRows("candidats.txt");
-    candidats->tab = (char**) malloc(candidats->dim*sizeof(char*));
-    for(int i=0; i<candidats->dim; i++)
-        candidats->tab[i] = (char*) malloc(64 * sizeof(char));
-    fprintf(logfp, "ok\n");
-        fprintf(logfp, "ok\n");
-    FILE * fp = fopen("candidats.txt", "r");
+bool checkCmd(t_command* arrCmd) {
+// {"-m", "-i", "-l", "-d", "cm", "cp", "cs", "va", "uni1", "uni2"};
+    //if(arrCmd->argOccur[0]==0)
+      //  return 1;
+    if(arrCmd->argOccur[3]>0) {
+        if(arrCmd->argOccur[7]>0)
+            return 0;
+        else if(arrCmd->argOccur[8]>0)
+            return 0;
+        else if(arrCmd->argOccur[9]>0)
+            return 0;
+    }
+    else if(arrCmd->argOccur[1]>0) {
+        if(arrCmd->argOccur[6]>0)
+            return 0;
+        else if(arrCmd->argOccur[5]>0)
+            return 0;
+        else if(arrCmd->argOccur[4]>0)
+            return 0;
+    }
+    return 1;
+}
+
+void init_candidats(t_command* arrCmd, FILE* logfp) {
+    fprintf(logfp, "\nIN init_candidat \n\n");
+    arrCmd->candidats.dim = arrCmd->t_duel.nbCol;
+    int offset = arrCmd->csvFile.offset;
+    arrCmd->candidats.tab = (char**) malloc(arrCmd->candidats.dim*sizeof(char*));
+    for(int i=0; i<arrCmd->candidats.dim; i++)
+        arrCmd->candidats.tab[i] = (char*) malloc(64 * sizeof(char));
+    FILE * fp = fopen(arrCmd->fileNames[0], "r");
     char line[512];
     char *token;                   
-    int k=0;
-    while (fgets(line, 512, fp)) {
-        token = strtok(line, "\n");
-        fprintf(logfp, "line : %s \n", line);
-        fprintf(logfp, "ok\n");
-        strcpy(candidats->tab[k] , token);
-        //candidats->tab[k] = token;
-        k++;
-        fprintf(logfp, "Candidats: %s \n", candidats->tab[k-1]);
+    fgets(line, 512, fp);
+    fprintf(logfp, "line : %s \noffset : %d\n", line, offset);
+    token = strtok(line, "\t");
+    for(int k=0; k<arrCmd->csvFile.nbCol; k++) {
+        fprintf(logfp, "TOKEN: %s \n", token);
+        if(k>=offset) {
+            fprintf(logfp, "k-offset : %d \n", k-offset);
+            strcpy(arrCmd->candidats.tab[k-offset] , token);
+            fprintf(logfp, "Candidats: %s \n\n", arrCmd->candidats.tab[k-offset]);
+        }
+        token = strtok(NULL, "\t");
     }
     fclose(fp);
 }
@@ -175,6 +200,10 @@ bool analyseCommande(t_command* cmdArray, int argc, char *argv[], FILE* logfp) {
     }
     if(!csvBool)
         return 0;
+    if(!checkCmd(cmdArray)) {
+        fprintf(logfp, "Deux arguments sont en conflits (la méthode et -d/-i)\n");
+        return 0;
+    }
     fprintf(logfp, "\n-OUT analyseCommande \n");
     return 1;
 }

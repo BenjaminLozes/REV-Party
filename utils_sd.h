@@ -21,7 +21,7 @@ typedef struct command_options {
     unsigned short int methodNb;
 } t_command;
 
-void init_tab_char_dyn(tab_candidats *candidats, FILE* logfp);
+void init_candidats(t_command* arrCmd, FILE* logfp);
 bool verifMethod(char* arg);
 bool correct_file(char* filename, FILE* logfp);
 void afficher_t_command(t_command* arrCmd, FILE* logfp);

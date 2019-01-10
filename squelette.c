@@ -21,16 +21,16 @@ void affiche_tab_int(int *tab, int dim, FILE *logfp){
 }
 
 void creer_t_mat_int_dyn(t_mat_int_dyn *stTab, int nbRows, int nbCol) {
-    stTab->tab = (int**) malloc(nbRows*sizeof(int*));
-    for(int x=0; x<nbRows; ++x)
-        stTab->tab[x] = creer_tab_int(nbCol);
     stTab->nbRows = nbRows;
     stTab->nbCol = nbCol;
+    stTab->tab = (int**) malloc(nbRows*sizeof(int*));
+    stTab->tab = creer_mat_int(nbRows, nbCol);
 }
 
 void creer_t_tab_int_dyn(t_tab_int_dyn *stTab, int dim) { // LIEN AVEC LA N-1, REATTRIBUTION DES NBs OU GET ?
-    stTab->tab = creer_tab_int(stTab->dim);
     stTab->dim = dim;
+    stTab->tab = (int*) malloc(stTab->dim*sizeof(int));
+    stTab->tab = creer_tab_int(stTab->dim);
 }
 
 void creer_t_mat_char_dyn(t_mat_char_star_dyn * s_tabmots) { // GROS DOUTE PQ PAS D'ARG ??

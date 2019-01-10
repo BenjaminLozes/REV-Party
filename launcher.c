@@ -3,12 +3,18 @@
 int main(int argc, char *argv[]) {
     t_command cmdArray;
     init_t_command(&cmdArray);
+    /**
+     * @brief 
+     * Pré vérification de la commande pour trouver un log si besoin
+     */
     FILE* logfp = checkLog(&cmdArray, argc, argv);
     if(analyseCommande(&cmdArray, argc, argv, logfp)==0) {
         afficher_t_command(&cmdArray, logfp);
         fprintf(stderr, "exit(EXIT_FAILURE)");
         return 0;
     }
+
+
     init_candidats(&cmdArray, logfp); 
     afficher_t_command(&cmdArray, logfp);
     fprintf(logfp, "OK----------\n");

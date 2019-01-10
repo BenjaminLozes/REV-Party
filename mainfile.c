@@ -35,6 +35,7 @@ int main() {
 
     printf("Tri :\n");
     bubbleSortList(&p);
+    printf("\n\n");
     dumpList(p,stdout);
 
     addFrontList(&p,e2);
@@ -46,6 +47,7 @@ int main() {
     afficher_element(e,stdout);
     printf("\nbelong ? %d\n",belongEltList(p,e1));
    afficher_element(e,stdout);
+   printf("NB ELEM : %d \n", p.nbElt);
 
     return(0);
 }

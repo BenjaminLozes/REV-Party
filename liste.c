@@ -29,8 +29,9 @@ void createList(liste *p) {
 void addTailList(liste *p, Elementliste e) {
     if(fullList(*p))
         return;
-    if(p->Tete == -1)
-        addFrontList(&p, e);
+    if(p->Tete == -1 || getTail(*p)==0) {
+    printf("ta mere---------------------------------\n");
+        addFrontList(p, e);}
     else {
         p->Tabliste[DIMMAX - (p->nbElt - p->Tete)] = e;
         p->nbElt++;
@@ -40,7 +41,7 @@ void addTailList(liste *p, Elementliste e) {
 void addFrontList(liste *p, Elementliste e) {
     if(fullList(*p))
         return;
-    p->Tabliste[++p->Tete] = e;
+    copie_element(&p->Tabliste[++p->Tete], e);
     p->nbElt++;
 }
 
@@ -64,13 +65,13 @@ void delFrontList(liste *p) {
 void headList(liste p, Elementliste *e) {
     if(emptyList(p))
         return;
-    *e = p.Tabliste[p.Tete];
+    copie_element(e, p.Tabliste[p.Tete]);
 }
 
 void tailList(liste p, Elementliste *e) {
     if(emptyList(p))
         return;
-    return getTail(p);
+    copie_element(e, p.Tabliste[getTail(p)]);
 }
 
 bool emptyList(liste p) {
@@ -88,54 +89,55 @@ bool fullList(liste p) {
 void dumpList(liste p, FILE *fp) {
     if(emptyList(p))
         return;
-    for(int w = getTail(p); w < DIMMAX; ++w)
-        fprintf(fp, "%d ", p.Tabliste[w]);
+    if(getTail(p)>p.Tete){
+        for(int w = getTail(p); w < DIMMAX; ++w)
+            afficher_element(p.Tabliste[w], fp);
+    }
     if(p.Tete!=-1) {
         for(int x=0; x<=p.Tete; ++x)
-            fprintf(fp, "%d ", p.Tabliste[x]);
+            afficher_element(p.Tabliste[x], fp);
     }
     fprintf(fp, "\n");
 }
 
 void swapEltList(Elementliste *a, Elementliste *b) {
-    Elementliste *temp;
-    *temp = *a;
-    *a = *b;
-    *b = *temp;
+    printf("-----PRE: \n");
+    afficher_element(*a, stdout);
+    afficher_element(*b, stdout);
+    Elementliste temp;
+    copie_element(&temp, *a);
+    copie_element(a, *b);
+    copie_element(b, temp);
+    printf("----POST: \n");
+    afficher_element(*a, stdout);
+    afficher_element(*b, stdout);
 }
 
 void bubbleSortList(liste *p) {
     if(emptyList(*p))
         return;
-    char* tab = indexTab(*p);
     bool swaped = true;
     int lenProcess = p->nbElt-1;
-    while(swaped) {
+    while(swaped || lenProcess==0) {
         swaped = false;
         for(int x=0; x<lenProcess; ++x) {
-            if(&p->Tabliste[tab[x]] < &p->Tabliste[tab[x+1]]) {
-                swapEltList(&p->Tabliste[tab[x]], &p->Tabliste[tab[x+1]]);
+            if(p->Tabliste[x].poids > p->Tabliste[x+1].poids) {
+                swapEltList(&p->Tabliste[x], &p->Tabliste[x+1]);
                 swaped = true;
             }
         }
         lenProcess--;
     }
-
 }
 
 void pickEltList(liste l, Elementliste *e, int index) {
-    char* tab = indexTab(l);
-    *e = l.Tabliste[tab[index]];
+    copie_element(e, l.Tabliste[index]);
 }
 
 bool belongEltList(liste p, Elementliste e) {
-    char* tab = indexTab(p);
     for(int x=0; x<p.nbElt; ++x) {
-        if(e.dest == p.Tabliste[tab[x]].dest) {
-            if(e.orig == p.Tabliste[tab[x]].orig) {
-                if(e.poids == p.Tabliste[tab[x]].poids)
+        if(cmp_elements(e, p.Tabliste[x])) {
                 return true;
-            }
         }
     }
     return false;

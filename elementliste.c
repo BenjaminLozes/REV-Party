@@ -2,8 +2,8 @@
 
 void saisie_element(Elementliste *e) {
     scanf("%d", &e->orig);
-    scanf("%d", &e->orig);
-    scanf("%d", &e->orig);
+    scanf("%d", &e->dest);
+    scanf("%d", &e->poids);
 }
 
 void copie_element(Elementliste *cible, Elementliste source) {
@@ -13,7 +13,7 @@ void copie_element(Elementliste *cible, Elementliste source) {
 }
 
 void afficher_element(Elementliste e,FILE *fp) {
-    printf("Element:\n- Orig: %d\n- Dest: %d\n- Poids: %d\n", e.orig, e.dest, e.poids);
+    fprintf(fp, "Element:\n- Orig: %d\n- Dest: %d\n- Poids: %d\n", e.orig, e.dest, e.poids);
 }
 
 bool cmp_elements(Elementliste e1,Elementliste e2) {

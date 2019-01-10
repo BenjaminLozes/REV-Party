@@ -23,27 +23,56 @@ int main(int argc, char *argv[]) {
             voteBool = uninominal(&cmdArray, 2, &res_panel, logfp);
             if(voteBool)
                 fprintf(stdout, "Mode de scrutin : uninominal à deux tours, %d candidats, %d votants, vainqueur = %s, score = %d \n", res_panel.nbCand, res_panel.nbVtants, res_panel.candidat, res_panel.prctScore);
+            else
+                fprintf(stderr, "exit(EXIT_FAILURE)");
             break;
         case 8:
             voteBool = uninominal(&cmdArray, 1, &res_panel, logfp);
             if(voteBool)
                 fprintf(stdout, "Mode de scrutin : uninominal à un tour, %d candidats, %d votants, vainqueur = %s, score = %d \n", res_panel.nbCand, res_panel.nbVtants, res_panel.candidat, res_panel.prctScore);
+            else
+                fprintf(stderr, "exit(EXIT_FAILURE)");
             break;
         case 7:  // VOTE ALTERNATIF
             voteBool = alternatif(&cmdArray, &res_panel, logfp);
             if(voteBool)
                 fprintf(stdout, "Mode de scrutin : vote alternatif, %d candidats, %d votants, vainqueur = %s \n", res_panel.nbCand, res_panel.nbVtants, res_panel.candidat);
+            else
+                fprintf(stderr, "exit(EXIT_FAILURE)");
             break;
         case 5:
-            //voteBool = condorcet(&cmdArray, "cs", logfp);
+            fprintf(stdout, "CONDORCET NON CODÉ \n");
             break;
         case 4:
-            //voteBool = condorcet(&cmdArray, "cp", logfp);
+            fprintf(stdout, "CONDORCET NON CODÉ \n");
             break;
         case 3:
-            //voteBool = condorcet(&cmdArray, "cm", logfp);
+            fprintf(stdout, "CONDORCET NON CODÉ \n");
             break;
+        case 0:
+            if(cmdArray.argOccur[1]>0) {
+                voteBool = uninominal(&cmdArray, 2, &res_panel, logfp);
+                if(voteBool)
+                    fprintf(stdout, "Mode de scrutin : uninominal à deux tours, %d candidats, %d votants, vainqueur = %s, score = %d %%\n", res_panel.nbCand, res_panel.nbVtants, res_panel.candidat, res_panel.prctScore);
+                else
+                    fprintf(stderr, "exit(EXIT_FAILURE)");
+                voteBool = uninominal(&cmdArray, 1, &res_panel, logfp);
+                if(voteBool)
+                    fprintf(stdout, "Mode de scrutin : uninominal à un tour, %d candidats, %d votants, vainqueur = %s, score = %d %%\n", res_panel.nbCand, res_panel.nbVtants, res_panel.candidat, res_panel.prctScore);
+                else
+                    fprintf(stderr, "exit(EXIT_FAILURE)");
+                voteBool = alternatif(&cmdArray, &res_panel, logfp);
+                if(voteBool)
+                    fprintf(stdout, "Mode de scrutin : vote alternatif, %d candidats, %d votants, vainqueur = %s \n", res_panel.nbCand, res_panel.nbVtants, res_panel.candidat);
+                else
+                    fprintf(stderr, "exit(EXIT_FAILURE)");
+                break;    
+            }
+            else
+                fprintf(stdout, "CONDORCETS NON CODÉS \n");
+
         default:
+
             break;
     }
     return 1;
